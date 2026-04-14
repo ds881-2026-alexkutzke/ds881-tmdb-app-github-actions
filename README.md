@@ -61,6 +61,66 @@ A atividade será considerada concluída quando:
 
 ---
 
+## Etapas Bônus
+
+Para os alunos que desejam elevar o nível do projeto e simular um ambiente real de produção, estas etapas adicionam camadas de segurança, organização e boas práticas de DevOps.
+
+### Testes de Compatibilidade (Matrix Testing)
+
+Em vez de testar apenas em uma versão do Node.js, você pode garantir que sua aplicação funciona em diferentes ambientes simultaneamente.
+
+* **O que fazer:** Utilize a propriedade `strategy` e o objeto `matrix` dentro do seu job de testes.
+* **Indicação:** Defina uma lista contendo as versões `20` e `24`. O GitHub Actions criará duas execuções paralelas automaticamente.
+* **Por que fazer:** Isso valida se o código que funciona no Node 24 não quebra em versões ligeiramente mais antigas (ou vice-versa), garantindo a resiliência do projeto.
+
+## Rastreabilidade com Tag Dinâmica (SHA do Commit)
+
+Usar tags fixas (como "v1") dificulta saber exatamente qual versão do código está rodando no contêiner. O SHA é a "impressão digital" única de cada commit.
+
+* **O que fazer:** Crie um passo (step) inicial que utilize comandos de shell para extrair os primeiros 7 caracteres da variável de ambiente `$GITHUB_SHA`.
+* **Indicação:** Utilize o comando `echo "sha=$SHA" >> $GITHUB_OUTPUT` para que este valor fique disponível para os passos seguintes. No comando de build do Docker, recupere esse valor via `steps`.
+* **Por que fazer:** Se surgir um bug em produção, você saberá exatamente qual código gerou aquela imagem específica.
+
+## Integração com Docker Hub e Secrets
+
+Agora que você já sabe usar segredos para a API do TMDB, vamos reforçar o padrão para infraestrutura.
+
+* **O que fazer:** Crie uma conta no Docker Hub e gere um *Access Token*. No GitHub, configure os segredos `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN`.
+* **Indicação:** Utilize a action oficial `docker/login-action` no seu workflow para realizar a autenticação automática antes de qualquer tentativa de envio (push).
+* **Por que fazer:** Isso automatiza a entrega da sua imagem para um registro público, permitindo que ela seja baixada em qualquer servidor do mundo.
+
+## Eficiência com Actions Oficiais (Build & Push)
+
+No mundo real, evitamos escrever scripts manuais de `docker build` se houver uma solução robusta e testada pela comunidade.
+
+* **O que fazer:** Substitua os comandos manuais de shell pela action oficial `docker/build-push-action`.
+* **Indicação:** Configure a action para realizar o build e o push em um único bloco, apontando para o contexto do repositório e passando as tags necessárias.
+* **Por que fazer:** Actions oficiais lidam melhor com cache, logs e erros do que scripts manuais simples.
+
+## Estratégia de Tagging: Latest + SHA
+
+Um padrão de mercado é manter uma tag que sempre aponta para o que há de mais novo, sem perder o histórico das versões anteriores.
+
+* **O que fazer:** Configure o seu step de build para gerar **duas tags simultâneas** para a mesma imagem.
+* **Indicação:** Uma tag deve ser fixa (`latest`) e a outra deve ser a tag dinâmica gerada no passo 2 (o SHA do commit).
+* **Por que fazer:** A tag `latest` facilita o deploy rápido, enquanto a tag com o SHA permite fazer *rollbacks* precisos para versões anteriores caso algo dê errado.
+
+## Fluxos Distintos: CI vs CD
+
+Nem toda ação deve acontecer a todo momento. Testar é frequente; fazer deploy é um evento especial.
+
+* **O que fazer:** Refine o gatilho `on` do seu workflow.
+* **Indicação:** Configure o pipeline para que os **testes** rodem em todo `pull_request` aberto, mas garanta que o **deploy** e o **push de imagens** só aconteçam quando houver um `push` efetivo na branch `release`.
+* **Por que fazer:** Isso economiza minutos de execução e evita que imagens de código "em andamento" (branches de feature) poluam o seu registro de produção.
+
+## Desafio Extra: Múltiplas Arquiteturas (Buildx)
+
+A nuvem moderna não roda apenas em processadores Intel/AMD (x86); muitos servidores e dispositivos móveis usam arquitetura ARM.
+
+* **O que fazer:** Utilize a action `docker/setup-buildx-action`.
+* **Indicação:** Configure o build para gerar imagens compatíveis com `linux/amd64` e `linux/arm64` simultaneamente. 
+* **Nota:** Esta etapa é opcional e demorada. Ela demonstra como criar uma imagem "universal" que roda tanto em um servidor de alta performance quanto em um Raspberry Pi.
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
