@@ -121,6 +121,34 @@ A nuvem moderna não roda apenas em processadores Intel/AMD (x86); muitos servid
 * **Indicação:** Configure o build para gerar imagens compatíveis com `linux/amd64` e `linux/arm64` simultaneamente. 
 * **Nota:** Esta etapa é opcional e demorada. Ela demonstra como criar uma imagem "universal" que roda tanto em um servidor de alta performance quanto em um Raspberry Pi.
 
+## Dinâmica de Trabalho: Simulando um Squad DevOps
+
+Siga as regras operacionais abaixo para a organização do grupo:
+
+### 1. Repositório Compartilhado e Proteção de Branch
+* **Formação:** Formem grupos de 3 a 4 integrantes.
+* **Hospedagem:** Apenas um integrante fará o Fork do repositório base para a sua conta e adicionará os demais membros do grupo como colaboradores (com permissão de escrita).
+* **Branch Protection:** O dono do repositório deve acessar as configurações (*Settings > Branches > Add branch protection rule*). Crie uma regra para a branch `release` marcando a opção **"Require a pull request before merging"**. 
+
+### 2. Gestão de Tarefas e Rastreabilidade
+* Ativem a aba **Projects** no repositório e criem um board no estilo Kanban com as colunas: *To Do, In Progress, Review, Done*.
+* Cada etapa principal desta atividade (Etapa 1, Etapa 2, Etapa 3, etc.) deve ser transformada em uma **Issue**.
+* Quando iniciarem uma etapa, o responsável deve associar o seu usuário à Issue correspondente e movê-la pelo board conforme o progresso.
+
+### 3. Rotação de Papéis e Revisão de Código
+Para que todos pratiquem as diferentes responsabilidades do ciclo de vida de desenvolvimento, os papéis do time devem **obrigatoriamente rotacionar** a cada nova etapa da atividade.
+
+Em cada entrega, o grupo deve distribuir as seguintes responsabilidades:
+* **Engenheiro DevOps (Autor):** Puxa a tarefa, cria a branch, escreve o código no arquivo `.yml`, realiza os commits e abre o **Pull Request (PR)**. Na descrição do PR, deve inserir uma referência automática para fechar a tarefa correspondente (ex: digitando `Fixes #2`).
+* **Revisor de Código (Reviewer):** Responsável por analisar o Pull Request do colega. **É proibido aprovar silenciosamente.** O revisor deve deixar pelo menos um comentário na aba *Files changed* ou na discussão principal do PR. Pode ser uma dúvida arquitetural, uma sugestão de melhoria ou a validação de que os logs do Actions confirmam o sucesso do código. Só então o PR deve ser aprovado.
+* **Release Manager:** Responsável por realizar o *Merge* seguro do código revisado para a branch `release`, deletar a branch antiga e garantir que o pipeline de integração contínua rodou com sucesso no ambiente final.
+
+### 4. Critérios de Validação da Atividade
+A entrega do grupo **não** será avaliada apenas observando o código final do arquivo YAML. A aprovação da atividade levará em conta os rastros de auditoria gerados pelo time:
+* As tarefas foram documentadas e fechadas via Issues.
+* Todo o código entrou no repositório exclusivamente através de Pull Requests.
+* Há evidências de comunicação técnica e validação cruzada (comentários) entre os membros do grupo durante as revisões de código.
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
