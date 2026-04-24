@@ -1,0 +1,33 @@
+name: CI/CD Pipeline
+
+# Gatilhos
+on:
+  push:
+    branches:
+      - release
+  workflow_dispatch: # GitHub actions
+
+jobs:
+  test:
+    name: Quality Assurance (Tests)
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Faz o checkout do codigo do repositorio para a maquina virtual
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configura o Node.js versão 20
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # 3. Instala dependencias
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Executa os testes padrao
+      - name: Run tests
+        run: npm test
