@@ -99,7 +99,7 @@ jobs:
 
   # Release do APK
   create-release:
-    needs: android-build
+    needs: [test,android-build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
